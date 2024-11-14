@@ -1,0 +1,46 @@
+import pandas as pd 
+from pgmpy.models import BayesianNetwork 
+from pgmpy.estimators import ParameterEstimator, BayesianEstimator 
+from pgmpy.estimators import MaximumLikelihoodEstimator 
+from pgmpy.inference import VariableElimination
+
+
+df = pd.read_csv('heart_cleveland_upload.csv') 
+
+df.head()
+
+df.tail()
+
+df.info()
+
+df.describe()
+
+model = BayesianNetwork([('age', 'condition'),  
+                         ('sex', 'condition'),  
+                         ('cp', 'condition'), 
+                         ('trestbps', 'condition'), 
+                         ('chol', 'condition')]) 
+
+
+model.fit(df,estimator=MaximumLikelihoodEstimator) 
+
+
+
+HeartDiseasetest_infer = VariableElimination(model)
+
+
+
+q1=HeartDiseasetest_infer.query(variables=['condition'],evidence={'cp':3}) 
+print(q1)
+
+
+q2=HeartDiseasetest_infer.query(variables=['condition'],evidence={'trestbps':140}) 
+print(q2) 
+
+
+q3=HeartDiseasetest_infer.query(variables=['condition'],evidence={'age':50}) 
+print(q3) 
+
+
+q4=HeartDiseasetest_infer.query(variables=['condition'],evidence={'chol':220}) 
+print(q4)

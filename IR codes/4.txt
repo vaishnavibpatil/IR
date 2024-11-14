@@ -1,0 +1,53 @@
+import numpy as np 
+import pandas as pd 
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer 
+from sklearn.naive_bayes import MultinomialNB 
+from sklearn.model_selection import train_test_split 
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+
+
+ data=pd.read_csv('completeSpamAssassin.csv') 
+
+ data=data.dropna()
+
+ data.head()
+
+ data.tail() 
+
+x=data['Body'] 
+y=data['Label'] 
+
+
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+
+
+vectorizer = CountVectorizer() 
+tfidf_transformer = TfidfTransformer() 
+X_train_counts = vectorizer.fit_transform(X_train) 
+X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts) 
+
+
+clf = MultinomialNB() 
+clf.fit(X_train_tfidf, y_train) 
+
+
+ X_test_counts = vectorizer.transform(X_test) 
+X_test_tfidf = tfidf_transformer.transform(X_test_counts) 
+y_pred = clf.predict(X_test_tfidf)
+
+print("Classification Report:") 
+print(classification_report(y_test, y_pred)) 
+print("\nConfusion Matrix:") 
+print(confusion_matrix(y_test, y_pred)) 
+print("\nAccuracy Score:", accuracy_score(y_test, y_pred)) 
+
+
+new_email = ["Congratulations! You've won a million dollars!"] 
+new_email_counts = vectorizer.transform(new_email) 
+new_email_tfidf = tfidf_transformer.transform(new_email_counts) 
+prediction = clf.predict(new_email_tfidf) 
+if prediction[0] == 1: 
+    print("\nThe email is classified as spam.") 
+else: 
+    print("\nThe email is classified as ham.")
+ 
